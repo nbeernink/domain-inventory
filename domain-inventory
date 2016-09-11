@@ -106,7 +106,7 @@ analyse_dns_records () {
 			wait
 
 			echo "Nameserver distribution:"
-			wc -l ./domains_hosted_by_*
+			wc -l domains_hosted_by_*
 			;;
 
 		A)
