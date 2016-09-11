@@ -6,20 +6,20 @@ A- or AAAA- records are pointing to.
 ## example-usage
 
 ```
-./domain-inventory.sh -d domains.list
-[Cleanup] Sorted domains.list
-Scanning 4 domains for NS records...
+./domain-inventory -d mydomain.list -o my-results-dir
+Scanning 500 domains for NS records...
 Nameserver distribution:
- 1 NS/foo.domainlist
- 2 NS/bar.domainlist
- 3 total
-Resolving domains    : 3
-Non-resolving domains: 1
-Checksum Ok!
+ 200 domains_hosted_by_foo.txt
+ 300 domains_hosted_by_bar.txt
+ 500 total
+Resolving domains    : 500
+Finished! Check your results in: my-results-dir
 ```
 
-* The NS directory now contains:
-   * $nameserver.domainlist which contains a list per nameserver
-   * resolving_domains.txt a list of domains that resolved a NS 
-   * non_resolving_domains.txt a list of domains that did not resolve
-* fetch_$type_result.txt files contain the raw data provided by dig
+## Description for output files
+* domains_hosted_by_foo.txt - a list of domains hosted on that nameserver
+* domains_resolving.txt     - domains that have resolving nameservers
+* domains_non_resolving.txt - domains that didn't resolve
+* domains_aligned.txt	    - domains that point to an ip in your list
+* domains_unaligned.txt     - domains that don't point to an ip in your list
+* fetch_$type_result.txt    - files contain the raw data provided by dig
