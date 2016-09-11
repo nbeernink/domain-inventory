@@ -6,9 +6,9 @@ set -eo pipefail
 # IPs are pointing to the domain or not.
 #
 
-GREEN='\033[0;32m'
-RED='\033[0;31m'
-NC='\033[0m' #no color
+green='\033[0;32m'
+red='\033[0;31m'
+nc='\033[0m' #no color
 
 trap ctrl_c INT
 
