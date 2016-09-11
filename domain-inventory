@@ -20,6 +20,21 @@ function ctrl_c {
 	rm -fv fetch_*_result.txt
 	rm -fv duplicate_domains.txt
 	exit 1
+usage() {
+   cat << HEREDOC
+
+   Usage: $(basename "$0") [-d domain.list]
+
+   optional arguments:
+     -h, --help           show this help message and exit
+     -o, --output-dir DIR directory to store results in
+     -i, --iplist FILE    file containing ipv4 addresses per line
+     -6, --ipv6list FILE  file containing ipv6 addresses per line
+     -w, --match-www      check if www prefix matches domain A and AAAA records
+
+HEREDOC
+	exit 0
+}
 }
 
 function checkFileExist {
@@ -163,6 +178,8 @@ do
 	make_output_dir "$output_dir"
 
 	case $key in
+#show usage if no parameters are present
+[[ $# -eq 0 ]] && usage
 		-d|--domainslist)
 			DOMAINS_LIST="$2"
 			checkFileExist "$DOMAINS_LIST"
@@ -188,8 +205,8 @@ do
 			#todo
 			shift # past argument
 			;;
-		*)
-			echo unknown option
+		-h|--help)
+			usage
 			;;
 	esac
 	shift # past argument or value
@@ -201,8 +218,8 @@ if [[ -n $1 ]]; then
 fi
 
 if [ -z "$DOMAINS_LIST" ]; then
-	echo "A list of domains is required, use -d or --domainslist to specify a file"
-	exit 1
+	echo "A list of domains is required!"
+	usage
 else
 	filecleanup "$DOMAINS_LIST"
 	fetchDNSrecords NS "$DOMAINS_LIST"
