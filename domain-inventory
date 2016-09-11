@@ -218,11 +218,6 @@ while true; do
 	shift # past argument or value
 done
 
-if [[ -n $1 ]]; then
-	echo "Last line of file specified as non-opt/last argument:"
-	exit 1
-fi
-
 if [[ -z "$domains_list" ]]; then
 	echo "A list of domains is required!"
 	usage
