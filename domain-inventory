@@ -11,15 +11,6 @@ red='\033[0;31m'
 nc='\033[0m' #no color
 output_dir=result-$(date +%F)
 
-trap ctrl_c INT
-
-function ctrl_c {
-	echo
-	echo "Aborted! Doing some cleanup..."
-	rm -rfv ns/
-	rm -fv fetch_*_result.txt
-	rm -fv duplicate_domains.txt
-	exit 1
 usage() {
    cat << HEREDOC
 
