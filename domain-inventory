@@ -26,12 +26,11 @@ usage() {
 HEREDOC
 	exit 0
 }
+
+check_file_existence() {
+	[[ -f "$1" ]] || (echo "File '${1}' does not exist" && exit 1)
 }
 
-function checkFileExist {
-	if [ ! -e "$1" ] ; then
-		echo "File '${1}' doesn't exist";
-		exit 1
 make_output_dir() {
 	declare output_dir="$1"
 	if [[ -d "$output_dir" ]]; then
@@ -170,19 +169,18 @@ do
 [[ $# -eq 0 ]] && usage
 		-d|--domainslist)
 			DOMAINS_LIST="$2"
-			checkFileExist "$DOMAINS_LIST"
+			check_file_existence "$domains_list"
 			shift # past argument
 			;;
 		-i|--ipslist)
 			IPS_LIST="$2"
-			checkFileExist "$IPS_LIST"
+			check_file_existence "$ips_list"
 			shift # past argument
 			;;
 		-6|--ipv6list)
 			IPV6_LIST="$2"
-			checkFileExist "$IPS_LIST"
 			ipv6_list=$(realpath "$2")
-			check_file_existence "$ips_list"
+			check_file_existence "$ipv6_list"
 			shift # past argument
 			;;
 		-o|--output-dir)
