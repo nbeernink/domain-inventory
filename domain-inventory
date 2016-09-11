@@ -186,17 +186,16 @@ while true; do
 	key="$1"
 	case "$key" in
 		-d|--domainslist)
-			DOMAINS_LIST="$2"
+			domains_list=$(realpath "$2")
 			check_file_existence "$domains_list"
 			shift # past argument
 			;;
 		-i|--ipslist)
-			IPS_LIST="$2"
+			ips_list=$(realpath "$2")
 			check_file_existence "$ips_list"
 			shift # past argument
 			;;
 		-6|--ipv6list)
-			IPV6_LIST="$2"
 			ipv6_list=$(realpath "$2")
 			check_file_existence "$ipv6_list"
 			shift # past argument
