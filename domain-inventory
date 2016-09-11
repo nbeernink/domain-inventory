@@ -51,50 +51,47 @@ make_output_dir() {
 	fi
 }
 
-function linecount {
+linecount() {
 	wc -l "$1"|cut -d' ' -f1
 }
 
-function filecleanup (){
-
+filecleanup() {
 	#check for empty lines and remove them
-	grep -qc '^$' "$DOMAINS_LIST" && sed -i '/^$/d' "$DOMAINS_LIST" && echo -e "${RED}[Cleanup]${NC} Removed blank lines from $DOMAINS_LIST"
+	grep -qc '^$' "$domains_list" && sed -i '/^$/d' "$domains_list" && echo -e "${red}[Cleanup]${nc} Removed blank lines from $domains_list"
 
 	#check if the file is sorted propertly if not, do so
-	sort --check=quiet "$DOMAINS_LIST" || ( sort "$DOMAINS_LIST" --output "$DOMAINS_LIST" && echo -e "${RED}[Cleanup]${NC} Sorted $DOMAINS_LIST" )
+	sort --check=quiet "$domains_list" || ( sort "$domains_list" --output "$domains_list" && echo -e "${red}[Cleanup]${nc} Sorted $domains_list" )
 
 	#check for dupes and remove them
-	uniques=$(uniq -cd "$DOMAINS_LIST")
-	if [ ! -z "$uniques" ]
+	uniques=$(uniq -cd "$domains_list")
+	if [[ ! -z "$uniques" ]]
 	then
-		sort --unique "$DOMAINS_LIST" --output "$DOMAINS_LIST"
 		echo "$uniques" >> duplicate_domains.txt
 		echo -e "${RED}[Cleanup]${NC} Removed duplicates: $(linecount duplicate_domains.txt) (see duplicate_domains.txt for a list)"
+		sort --unique "$domains_list" --output "$domains_list"
 	fi
 
 }
 
-function fetchDNSrecords {
-	TYPE=$1
-	DOMAINS_LIST=$2
-	if [ ! -e fetch_"$TYPE"_result.txt ]; then
-		echo "Scanning $(linecount "$DOMAINS_LIST") domains for $TYPE records..."
+fetch_dns_records() {
+	declare recordtype="$1" domains_list="$2"
+
+	if [[ ! -e fetch_"$recordtype"_result.txt ]]; then
+		echo "Scanning $(linecount "$domains_list") domains for $recordtype records..."
 		while IFS= read -r domain
 		do
-			dig "$TYPE" +noall +answer "$domain" >> fetch_"$TYPE"_result.txt &
-		done < "$DOMAINS_LIST"
+			dig "$recordtype" +noall +answer "$domain" >> fetch_"$recordtype"_result.txt &
+		done < "$domains_list"
 		wait
 	else
-		echo "Found fetch_${TYPE}_result.txt, using as cache"
+		echo "Found fetch_${recordtype}_result.txt, using as cache"
 	fi
 }
 
-function analyseRecords {
-	recordtype=$1
+analyse_dns_records () {
+	declare recordtype=$1
 	case $recordtype in
-		NS|ns)
-			rm -rf NS/*
-			mkdir -p NS
+		NS)
 			while IFS= read -r domain
 			do
 				if grep -qcw "$domain" fetch_NS_result.txt;
@@ -106,7 +103,7 @@ function analyseRecords {
 					echo "$domain" >> NS/non_resolving_domains.txt
 				fi
 
-			done < "$DOMAINS_LIST"
+			done < "$domains_list"
 			wait
 
 			echo "Nameserver distribution:"
@@ -128,14 +125,14 @@ function analyseRecords {
 	esac
 }
 
-function match_WWW_to_non_WWW {
+match_WWW_to_non_WWW() {
 	echo todo
 }
 
-function printSummary {
 	echo -e "Resolving domains    : ${GREEN}$(linecount NS/resolving_domains.txt)${NC}"
 	if [ -e NS/non_resolving_domains.txt ]; then
 		echo -e "Non-resolving domains: ${RED}$(linecount NS/non_resolving_domains.txt)${NC}"
+printSummary() {
 	fi
 
 	if [ -e A/aligned_domains.txt ]; then
@@ -153,7 +150,7 @@ function printSummary {
 	#do a checksum
 	nstotal=$(wc -l NS/*.domainlist|grep total|awk '{print $1}')
 	resolvingtotal=$(linecount NS/resolving_domains.txt)
-	if [ "$nstotal" != "$resolvingtotal" ]; then
+	if [[ "$nstotal" != "$resolvingtotal" ]]; then
 		echo "Checksum not okay, results may be inaccurate!"
 	else
 		echo "Checksum Ok!"
@@ -199,6 +196,12 @@ do
 		-h|--help)
 			usage
 			;;
+		--)
+			break
+			;;
+		*)
+			break
+			exit 3
 	esac
 	shift # past argument or value
 done
@@ -208,7 +211,7 @@ if [[ -n $1 ]]; then
 	exit 1
 fi
 
-if [ -z "$DOMAINS_LIST" ]; then
+if [[ -z "$domains_list" ]]; then
 	echo "A list of domains is required!"
 	usage
 else
@@ -225,4 +228,3 @@ else
 	fi
 	printSummary
 fi
-
