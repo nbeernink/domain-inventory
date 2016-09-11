@@ -156,15 +156,35 @@ printSummary() {
 
 }
 
-#Handle parameters
-while [[ $# -gt 1 ]]
-do
-	key="$1"
+main() {
+	filecleanup "$domains_list"
+
 	make_output_dir "$output_dir"
 
-	case $key in
+	fetch_dns_records NS "$domains_list"
+	analyse_dns_records NS
+
+	if [[ ! -z "$ips_list" ]]; then
+		fetch_dns_records A domains_resolving.txt
+		analyse_dns_records A
+	fi
+	if [[ ! -z "$ipv6_list" ]]; then
+		fetch_dns_records AAAA domains_resolving.txt
+		analyse_dns_records AAAA
+	fi
+
+	printSummary
+
+	exit 0
+}
+
 #show usage if no parameters are present
 [[ $# -eq 0 ]] && usage
+
+#handle parameters
+while true; do
+	key="$1"
+	case "$key" in
 		-d|--domainslist)
 			DOMAINS_LIST="$2"
 			check_file_existence "$domains_list"
@@ -211,16 +231,5 @@ if [[ -z "$domains_list" ]]; then
 	echo "A list of domains is required!"
 	usage
 else
-	filecleanup "$DOMAINS_LIST"
-	fetchDNSrecords NS "$DOMAINS_LIST"
-	analyseRecords NS
-	if [ ! -z "$IPS_LIST" ]; then
-		fetchDNSrecords A NS/resolving_domains.txt
-		analyseRecords A
-	fi
-	if [ ! -z "$IPV6_LIST" ]; then
-		fetchDNSrecords AAAA NS/resolving_domains.txt
-		analyseRecords AAAA
-	fi
-	printSummary
+	main
 fi
