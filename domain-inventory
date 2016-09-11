@@ -9,6 +9,7 @@ set -eo pipefail
 green='\033[0;32m'
 red='\033[0;31m'
 nc='\033[0m' #no color
+output_dir=result-$(date +%F)
 
 trap ctrl_c INT
 
@@ -25,6 +26,22 @@ function checkFileExist {
 	if [ ! -e "$1" ] ; then
 		echo "File '${1}' doesn't exist";
 		exit 1
+make_output_dir() {
+	declare output_dir="$1"
+	if [[ -d "$output_dir" ]]; then
+		while read -p "Output dir '$(basename "$output_dir")' exists, remove it and start over? (y/n) " answer 
+		do
+			#echo "Output dir '$output_dir' exists, remove it and start over? (y/n) " answer 
+			case ${answer:0:1} in
+				y|Y ) rm -rf "$output_dir"; main;;
+				n|N ) exit 0;;
+				* ) echo "Please answer yes or no.";;
+			esac
+		done
+
+	else
+		mkdir -p "$output_dir"
+		cd "$output_dir"
 	fi
 }
 
@@ -135,6 +152,7 @@ function printSummary {
 	else
 		echo "Checksum Ok!"
 	fi
+	echo "Finished! Check your results in: $(basename "$output_dir")"
 
 }
 
@@ -142,6 +160,7 @@ function printSummary {
 while [[ $# -gt 1 ]]
 do
 	key="$1"
+	make_output_dir "$output_dir"
 
 	case $key in
 		-d|--domainslist)
@@ -157,6 +176,12 @@ do
 		-6|--ipv6list)
 			IPV6_LIST="$2"
 			checkFileExist "$IPS_LIST"
+			ipv6_list=$(realpath "$2")
+			check_file_existence "$ips_list"
+			shift # past argument
+			;;
+		-o|--output-dir)
+			output_dir=$(realpath "$2")
 			shift # past argument
 			;;
 		-w|--match-www)
