@@ -109,17 +109,14 @@ analyse_dns_records () {
 			wc -l NS/*.domainlist
 			;;
 
-		A|a)
-			rm -rf A/*
-			mkdir -p A
-			grep -f "$IPS_LIST" fetch_A_result.txt >> A/aligned_domains.txt
-			grep -vf "$IPS_LIST" fetch_A_result.txt >> A/unaligned_domains.txt
+		A)
+			grep -f "$ips_list" fetch_A_result.txt >> domains_aligned.txt
+			grep -vf "$ips_list" fetch_A_result.txt >> domains_unaligned.txt
 			;;
 
-		AAAA|aaaa)
-			rm -rf AAAA/*
-			grep -f "$IPV6_LIST" fetch_AAAA_result.txt >> AAAA/aligned_IPV6_domains.txt
-			grep -vf "$IPV6_LIST" fetch_AAAA_result.txt >> AAAA/unaligned_IPV6_domains.txt
+		AAAA)
+			grep -f "$ipv6_list" fetch_AAAA_result.txt >> domains_aligned_IPV6.txt
+			grep -vf "$ipv6_list" fetch_AAAA_result.txt >> domains_unaligned_IPV6.txt
 			;;
 	esac
 }
