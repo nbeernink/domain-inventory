@@ -151,8 +151,6 @@ printSummary() {
 	resolvingtotal=$(linecount NS/resolving_domains.txt)
 	if [[ "$nstotal" != "$resolvingtotal" ]]; then
 		echo "Checksum not okay, results may be inaccurate!"
-	else
-		echo "Checksum Ok!"
 	fi
 	echo "Finished! Check your results in: $(basename "$output_dir")"
 
