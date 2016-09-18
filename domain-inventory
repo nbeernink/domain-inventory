@@ -125,7 +125,7 @@ match_WWW_to_non_WWW() {
 	echo todo
 }
 
-printSummary() {
+print_summary() {
 	echo -e "Resolving domains    : ${green}$(linecount domains_resolving.txt)${nc}"
 	if [[ -e domains_non_resolving.txt ]]; then
 		echo -e "Non-resolving domains: ${red}$(linecount domains_non_resolving.txt)${nc}"
@@ -170,7 +170,7 @@ main() {
 		analyse_dns_records AAAA
 	fi
 
-	printSummary
+	print_summary
 
 	exit 0
 }
