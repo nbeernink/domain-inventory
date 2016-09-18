@@ -154,9 +154,9 @@ print_summary() {
 }
 
 main() {
-	filecleanup "$domains_list"
-
 	make_output_dir "$output_dir"
+	
+	filecleanup "$domains_list"
 
 	fetch_dns_records NS "$domains_list"
 	analyse_dns_records NS
