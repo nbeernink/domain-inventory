@@ -91,6 +91,15 @@ analyse_dns_records () {
 	declare recordtype=$1
 	case $recordtype in
 		NS)
+			#check for CNAME NS-records which isn't legitimate DNS per RFC but it does occur in the wild
+			grep -q CNAME fetch_NS_result.txt && sed -i -e '/CNAME/{w domains_with_CNAME.txt' -e 'd}' fetch_NS_result.txt
+			if [[ -e domains_with_CNAME.txt ]]; then
+				echo
+				echo -e "${red}Warning${nc}: Found $(linecount domains_with_CNAME.txt) domains with a CNAME for NS. You should fix this! https://tools.ietf.org/html/rfc2181 #10.3"
+				echo "Not doing any further processing on them. Removed them from the list and stored them in domains_with_CNAME.txt"
+				echo
+			fi
+			
 			while IFS= read -r domain
 			do
 				if grep -qcw "$domain" fetch_NS_result.txt;
