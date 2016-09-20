@@ -101,7 +101,7 @@ analyse_dns_records () {
 
 			while IFS= read -r domain
 			do
-				if grep -qcw "$domain" fetch_NS_result.txt;
+				if grep -qw "$domain" fetch_NS_result.txt;
 				then
 					echo "$domain" >> domains_resolving.txt
 					while read ns;
