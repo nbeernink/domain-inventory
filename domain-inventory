@@ -110,8 +110,15 @@ analyse_dns_records () {
 					done < <(grep "^$domain\." fetch_NS_result.txt|awk '{print $5}'|awk -F. '{print $2}'|sort|uniq);
 				else
 					echo "$domain" >> domains_non_resolving.txt
+					if [[ -e domains_with_CNAME.txt ]];
+					then
+						#remove CNAMED domains from domains_non_resolving.txt
+						while read cname_domain;
+						do
+							sed -i "/$cname_domain/d" domains_non_resolving.txt
+						done < <(awk '{print $1}' domains_with_CNAME.txt|uniq|sed 's/.$//')
+					fi
 				fi
-
 			done < "$domains_list"
 			wait
 
