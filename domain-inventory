@@ -34,9 +34,8 @@ check_file_existence() {
 make_output_dir() {
 	declare output_dir="$1"
 	if [[ -d "$output_dir" ]]; then
-		while read -p "Output dir '$(basename "$output_dir")' exists, remove it and start over? (y/n) " answer 
+		while read -p "Output dir '$(basename "$output_dir")' exists, remove it and start over? (y/n) " answer
 		do
-			#echo "Output dir '$output_dir' exists, remove it and start over? (y/n) " answer 
 			case ${answer:0:1} in
 				y|Y ) rm -rf "$output_dir"; main;;
 				n|N ) exit 0;;
@@ -99,7 +98,7 @@ analyse_dns_records () {
 				echo "Not doing any further processing on them. Removed them from the list and stored them in domains_with_CNAME.txt"
 				echo
 			fi
-			
+
 			while IFS= read -r domain
 			do
 				if grep -qcw "$domain" fetch_NS_result.txt;
@@ -164,7 +163,7 @@ print_summary() {
 
 main() {
 	make_output_dir "$output_dir"
-	
+
 	filecleanup "$domains_list"
 
 	fetch_dns_records NS "$domains_list"
