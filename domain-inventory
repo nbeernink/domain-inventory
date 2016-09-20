@@ -105,7 +105,7 @@ analyse_dns_records () {
 				if grep -qcw "$domain" fetch_NS_result.txt;
 				then
 					echo "$domain" >> domains_resolving.txt
-					echo "$domain" >> "domains_hosted_by_$(grep -w "$domain" fetch_NS_result.txt|awk '{print $5}'|awk -F. '{print $2}'|sort|uniq).txt"
+					echo "$domain" >> "domains_hosted_by_$(grep "^$domain\." fetch_NS_result.txt|awk '{print $5}'|awk -F. '{print $2}'|sort|uniq).txt"
 
 				else
 					echo "$domain" >> domains_non_resolving.txt
