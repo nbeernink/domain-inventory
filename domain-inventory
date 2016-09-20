@@ -104,8 +104,10 @@ analyse_dns_records () {
 				if grep -qcw "$domain" fetch_NS_result.txt;
 				then
 					echo "$domain" >> domains_resolving.txt
-					echo "$domain" >> "domains_hosted_by_$(grep "^$domain\." fetch_NS_result.txt|awk '{print $5}'|awk -F. '{print $2}'|sort|uniq).txt"
-
+					while read ns;
+					do
+						echo "$domain" >> domains_hosted_by_"$ns".txt
+					done < <(grep "^$domain\." fetch_NS_result.txt|awk '{print $5}'|awk -F. '{print $2}'|sort|uniq);
 				else
 					echo "$domain" >> domains_non_resolving.txt
 				fi
@@ -152,7 +154,7 @@ print_summary() {
 		echo -e "Unaligned IPV6 domains: ${red}$(linecount domains_unaligned_IPV6.txt)${nc}"
 	fi
 	#do a checksum
-	nstotal=$(wc -l ./domains_hosted_by_*|grep total|awk '{print $1}')
+	nstotal=$(cat ./domains_hosted_by_*|sort|uniq|wc -l|grep total|awk '{print $1}')
 	resolvingtotal=$(linecount domains_resolving.txt)
 	if [[ "$nstotal" != "$resolvingtotal" ]]; then
 		echo "Checksum not okay, results may be inaccurate!"
