@@ -77,6 +77,7 @@ fetch_dns_records() {
 
 	if [[ ! -e fetch_"$recordtype"_result.txt ]]; then
 		echo "Scanning $(linecount "$domains_list") domains for $recordtype records..."
+		echo
 		while IFS= read -r domain
 		do
 			dig "$recordtype" +noall +answer "$domain" >> fetch_"$recordtype"_result.txt &
@@ -137,6 +138,7 @@ analyse_dns_records () {
 
 			echo "Nameserver distribution:"
 			wc -l domains_hosted_by_*
+			echo
 			;;
 
 		A)
@@ -156,28 +158,42 @@ match_WWW_to_non_WWW() {
 }
 
 print_summary() {
+	echo "==================== Summary ===================="
 	echo
-	echo -e "Resolving domains    : ${green}$(linecount domains_resolving.txt)${nc}"
+	echo "Domains in supplied list: $(linecount "$domains_list")"
+	echo
+	echo "*** NS-record analys ***"
+	echo -e "Resolving domains       : ${green}$(linecount domains_resolving.txt)${nc}"
 	if [[ -e domains_non_resolving.txt ]]; then
-		echo -e "Non-resolving domains: ${red}$(linecount domains_non_resolving.txt)${nc}"
+		echo -e "Non-resolving domains   : ${red}$(linecount domains_non_resolving.txt)${nc}"
 	fi
 	if [[ -e "domains_with_CNAME.txt" ]]; then
-		echo -e "Domains with a CNAME : ${red}$(linecount domains_with_CNAME.txt)${nc}"
-	fi
-	if [[ -e domains_aligned.txt ]]; then
-		echo -e "Aligned IPV4 domains: ${green}$(linecount domains_aligned.txt)${nc}"
-	fi
-	if [[ -e domains_unaligned.txt ]]; then
-		echo -e "Unaligned IPV4 domains: ${red}$(linecount domains_unaligned.txt)${nc}"
-	fi
-	if [[ -e domains_aligned_IPV6.txt ]]; then
-		echo -e "Aligned IPV6 domains: ${green}$(linecount domains_aligned_IPV6.txt)${nc}"
-	fi
-	if [[ -e domains_unaligned_IPV6.txt ]]; then
-		echo -e "Unaligned IPV6 domains: ${red}$(linecount domains_unaligned_IPV6.txt)${nc}"
+		echo -e "Domains with a CNAME    : ${red}$(linecount domains_with_CNAME.txt)${nc}"
 	fi
 	if [[ -e domains_hosted_in_multipe_nameservers.txt ]]; then
-		echo -e "Domains hosted in multiple nameservers: ${yellow}$(grep -cv domains_hosted_by domains_hosted_in_multipe_nameservers.txt)${nc}"
+		echo -e "Cross-hosted domains    : ${yellow}$(grep -cv domains_hosted_by domains_hosted_in_multipe_nameservers.txt)${nc}"
+	fi
+
+	echo
+
+	if [[ $ips_list != '' ]]; then
+		echo "*** A-record analyis ***";
+		if [[ -e domains_aligned.txt ]]; then
+			echo -e "Aligned IPV4 domains    : ${green}$(linecount domains_aligned.txt)${nc}"
+		fi
+		if [[ -e domains_unaligned.txt ]]; then
+			echo -e "Unaligned IPV4 domains  : ${red}$(linecount domains_unaligned.txt)${nc}"
+		fi
+	fi
+
+	if [[ $ipv6_list != '' ]]; then
+		echo "*** AAAA-record analysis***";
+		if [[ -e domains_aligned_IPV6.txt ]]; then
+			echo -e "Aligned IPV6 domains    : ${green}$(linecount domains_aligned_IPV6.txt)${nc}"
+		fi
+		if [[ -e domains_unaligned_IPV6.txt ]]; then
+			echo -e "Unaligned IPV6 domains  : ${red}$(linecount domains_unaligned_IPV6.txt)${nc}"
+		fi
 	fi
 
 	#do a checksum
@@ -186,6 +202,7 @@ print_summary() {
 	if [[ "$nstotal" != "$resolvingtotal" ]]; then
 		echo "Checksum not okay, results may be inaccurate!"
 	fi
+	echo
 	echo "Finished! Check your results in: $(basename "$output_dir")"
 
 }
