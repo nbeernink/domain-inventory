@@ -8,6 +8,7 @@ set -eo pipefail
 
 green='\033[0;32m'
 red='\033[0;31m'
+yellow='\033[0;33m'
 nc='\033[0m' #no color
 output_dir=result-$(date +%F)
 
@@ -122,6 +123,18 @@ analyse_dns_records () {
 			done < "$domains_list"
 			wait
 
+			# check for domains that hosted by nameservers in different domains
+			# this could potentially require a DNS change in two (or more) seperate places
+			while read domain;
+			do
+				if [[ $(wc -l <(grep "^$domain$" domains_hosted_by*|grep -v ':0')|awk '{print $1}') -gt 1 ]]; then
+					{
+						echo "$domain matched in:";
+						grep -l "^$domain$" domains_hosted_by*;
+					} >> domains_hosted_in_multipe_nameservers.txt
+				fi
+			done < domains_resolving.txt
+
 			echo "Nameserver distribution:"
 			wc -l domains_hosted_by_*
 			;;
@@ -163,6 +176,10 @@ print_summary() {
 	if [[ -e domains_unaligned_IPV6.txt ]]; then
 		echo -e "Unaligned IPV6 domains: ${red}$(linecount domains_unaligned_IPV6.txt)${nc}"
 	fi
+	if [[ -e domains_hosted_in_multipe_nameservers.txt ]]; then
+		echo -e "Domains hosted in multiple nameservers: ${yellow}$(grep -cv domains_hosted_by domains_hosted_in_multipe_nameservers.txt)${nc}"
+	fi
+
 	#do a checksum
 	nstotal=$(cat ./domains_hosted_by_*|sort|uniq|wc -l)
 	resolvingtotal=$(linecount domains_resolving.txt)
