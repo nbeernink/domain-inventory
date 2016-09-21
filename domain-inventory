@@ -1,5 +1,5 @@
 #!/bin/bash
-set -eo pipefail
+set -o pipefail
 #
 # This script processes a list of domains to check which nameservers
 # are used. If a list of IPs is given it will also check if the
