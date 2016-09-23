@@ -161,7 +161,7 @@ print_summary() {
 	echo
 	echo "Domains in supplied list: $(linecount "$domains_list")"
 	echo
-	echo "*** NS-record analys ***"
+	echo "*** NS-record analysis ***"
 	echo -e "Resolving domains       : ${green}$(linecount domains_resolving.txt)${nc}"
 	if [[ -e domains_non_resolving.txt ]]; then
 		echo -e "Non-resolving domains   : ${red}$(linecount domains_non_resolving.txt)${nc}"
@@ -176,7 +176,7 @@ print_summary() {
 	echo
 
 	if [[ $ips_list != '' ]]; then
-		echo "*** A-record analyis ***";
+		echo "*** A-record analysis ***";
 		if [[ -e domains_aligned.txt ]]; then
 			echo -e "Aligned IPV4 domains    : ${green}$(linecount domains_aligned.txt)${nc}"
 		fi
