@@ -22,7 +22,6 @@ usage() {
      -o, --output-dir DIR directory to store results in
      -i, --iplist FILE    file containing ipv4 addresses per line
      -6, --ipv6list FILE  file containing ipv6 addresses per line
-     -w, --match-www      check if www prefix matches domain A and AAAA records
 
 HEREDOC
 	exit 0
