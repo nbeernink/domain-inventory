@@ -20,7 +20,7 @@ usage() {
    optional arguments:
      -h, --help           show this help message and exit
      -o, --output-dir DIR directory to store results in
-     -i, --iplist FILE    file containing ipv4 addresses per line
+     -i, --ipv4list FILE  file containing ipv4 addresses per line
      -6, --ipv6list FILE  file containing ipv6 addresses per line
 
 HEREDOC
@@ -141,8 +141,8 @@ analyse_dns_records () {
 			;;
 
 		A)
-			grep -f "$ips_list" fetch_A_result.txt >> domains_aligned.txt
-			grep -vf "$ips_list" fetch_A_result.txt >> domains_unaligned.txt
+			grep -f "$ipv4_list" fetch_A_result.txt >> domains_aligned.txt
+			grep -vf "$ipv4_list" fetch_A_result.txt >> domains_unaligned.txt
 			;;
 
 		AAAA)
@@ -175,7 +175,7 @@ print_summary() {
 
 	echo
 
-	if [[ $ips_list != '' ]]; then
+	if [[ $ipv4_list != '' ]]; then
 		echo "*** A-record analysis ***";
 		if [[ -e domains_aligned.txt ]]; then
 			echo -e "Aligned IPV4 domains    : ${green}$(linecount domains_aligned.txt)${nc}"
@@ -215,7 +215,7 @@ main() {
 
 	analyse_dns_records NS
 
-	if [[ ! -z "$ips_list" ]]; then
+	if [[ ! -z "$ipv4_list" ]]; then
 		fetch_dns_records A domains_resolving.txt
 		analyse_dns_records A
 	fi
@@ -241,9 +241,9 @@ while true; do
 			check_file_existence "$domains_list"
 			shift # past argument
 			;;
-		-i|--ipslist)
-			ips_list=$(realpath "$2")
-			check_file_existence "$ips_list"
+		-i|--ipv4list)
+			ipv4_list=$(realpath "$2")
+			check_file_existence "$ipv4_list"
 			shift # past argument
 			;;
 		-6|--ipv6list)
