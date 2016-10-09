@@ -63,10 +63,10 @@ linecount() {
 
 filecleanup() {
 	#check for empty lines and remove them
-	grep -qc '^$' "$domains_list" && sed -i '/^$/d' "$domains_list" && echo -e "${red}[Cleanup]${nc} Removed blank lines from $domains_list"
+	grep -qc '^$' "$domains_list" && sed -i '/^$/d' "$domains_list" && echo -e "${yellow}[Cleanup]${nc} Removed blank lines from $domains_list"
 
-	#check if the file is sorted propertly if not, do so
-	sort --check=quiet "$domains_list" || ( sort "$domains_list" --output "$domains_list" && echo -e "${red}[Cleanup]${nc} Sorted $domains_list" )
+	#check if the file is sorted properly if not, do so
+	sort --check=quiet "$domains_list" || ( sort "$domains_list" --output "$domains_list" && echo -e "${yellow}[Cleanup]${nc} Sorted $domains_list" )
 
 	#check for dupes and remove them
 	uniques=$(uniq -cd "$domains_list")
@@ -74,7 +74,7 @@ filecleanup() {
 	then
 		sort --unique "$domains_list" --output "$domains_list"
 		echo "$uniques" >> "$output_dir"/duplicate_domains.txt
-		echo -e "${red}[Cleanup]${nc} Removed duplicates: $(linecount "$output_dir"/duplicate_domains.txt) (see $output_dir/duplicate_domains.txt for a list)"
+		echo -e "${yellow}[Cleanup]${nc} Removed duplicates: $(linecount "$output_dir"/duplicate_domains.txt) (see $output_dir/duplicate_domains.txt for a list)"
 	fi
 
 }
