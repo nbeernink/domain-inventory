@@ -131,7 +131,7 @@ analyse_dns_records () {
 			wait
 
 			# check for domains that hosted by nameservers in different domains
-			# this could potentially require a DNS change in two (or more) seperate places
+			# this could potentially require a DNS change in two (or more) separate places
 			while read domain;
 			do
 				if [[ $(wc -l <(grep "^$domain$" domains_hosted_by*|grep -v ':0')|awk '{print $1}') -gt 1 ]]; then
