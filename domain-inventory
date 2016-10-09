@@ -33,7 +33,10 @@ HEREDOC
 }
 
 check_file_existence() {
-	[[ -f "$1" ]] || (echo "File '${1}' does not exist" && exit 1)
+	if [[ ! -f "$1" ]]; then
+		echo "File '${1}' does not exist"
+		exit 1
+	fi
 }
 
 make_output_dir() {
