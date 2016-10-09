@@ -12,6 +12,9 @@ yellow='\033[0;33m'
 nc='\033[0m' #no color
 output_dir=result-$(date +%F)
 
+#default user
+user=root
+
 usage() {
    cat << HEREDOC
 
@@ -22,6 +25,8 @@ usage() {
      -o, --output-dir DIR directory to store results in
      -i, --ipv4list FILE  file containing ipv4 addresses per line
      -6, --ipv6list FILE  file containing ipv6 addresses per line
+     -s, --server HOST    plesk or directadmin server to pull domain list from
+     -u, --user USER      username used to connect to the server
 
 HEREDOC
 	exit 0
@@ -152,6 +157,43 @@ analyse_dns_records () {
 	esac
 }
 
+ssh_connect_test(){
+	if ssh -q "$user"@"$server" exit; then
+		echo -e "${green}[Success]${nc} Connection to $user@$server successful!"
+	else
+		echo -e "${red}[Failure]${nc} Connection to $user@$server failed!"
+		exit 1
+	fi
+}
+
+fetch_domainlist_from_server() {
+	domains_list="$server"-domains.list
+	if ssh "$user"@"$server" "test -d /usr/local/psa"; then
+		plesk_version=$(ssh "$user"@"$server" "cut -d' ' -f1 /usr/local/psa/version|cut -d. -f1,2")
+		if [[ $plesk_version == "12.5" ]]; then
+			ssh "$user"@"$server" "plesk bin site --list" > "$domains_list"
+		else
+			ssh "$user"@"$server" "MYSQL_PWD=\$(cat /etc/psa/.psa.shadow) mysql -Ns -u admin -Dpsa -e 'SELECT name FROM domains'" > "$domains_list"
+		fi
+		echo "Plesk $plesk_version detected"
+	elif ssh "$user"@"$server" "test -d /usr/local/directadmin"; then
+		echo "DirectAdmin detected"
+		ssh "$user"@"$server" "cat /etc/virtual/domainowners|cut -d: -f1" > "$domains_list"
+	else
+		echo -e "${red}[Failure]${nc} CP not supported!"
+		exit 1
+	fi
+	check_file_existence "$domains_list" && echo -e "${green}[Success]${nc} Fetched domainslist from $server"
+}
+
+
+fetch_iplist_from_server() {
+	ssh "$user"@"$server" "ip -4 -o addr show scope global"|awk '{gsub(/\/.*/,"",$4); print $4}' > "$server"-ipv4.list
+	[[ -s "$server"-ipv4.list ]] && echo "Fetched IPv4 address list from $server"
+	ssh "$user"@"$server" "ip -6 -o addr show scope global"|awk '{gsub(/\/.*/,"",$4); print $4}' > "$server"-ipv6.list
+	[[ -s "$server"-ipv6.list ]] && echo "Fetched IPv6 address list from $server"
+}
+
 match_WWW_to_non_WWW() {
 	echo todo
 }
@@ -209,6 +251,18 @@ print_summary() {
 main() {
 	make_output_dir "$output_dir"
 
+	if [[ -n "$server" ]]; then
+		ssh_connect_test
+		fetch_domainlist_from_server
+		fetch_iplist_from_server
+		if [[ -s "$server"-ipv4.list ]]; then
+			ipv4_list="$server"-ipv4.list
+		fi
+		if [[ -s "$server"-ipv6.list ]]; then
+			ipv6_list="$server"-ipv6.list
+		fi
+	fi
+
 	filecleanup "$domains_list"
 
 	fetch_dns_records NS "$domains_list"
@@ -255,6 +309,14 @@ while true; do
 			output_dir=$(realpath "$2")
 			shift # past argument
 			;;
+		-s|--server)
+			server="$2"
+			shift #past argument
+			;;
+		-u|--user)
+			user="$2"
+			shift #past argument
+			;;
 		-w|--match-www)
 			#todo
 			shift # past argument
@@ -272,9 +334,11 @@ while true; do
 	shift # past argument or value
 done
 
-if [[ -z "$domains_list" ]]; then
-	echo "A list of domains is required!"
-	usage
-else
+if [[ -n "$server" ]]; then
 	main
+elif [[ -n "$domains_list" ]]; then
+	main
+else
+	echo "A list of domains or server is required!"
+	usage
 fi
