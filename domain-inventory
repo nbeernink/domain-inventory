@@ -65,6 +65,9 @@ filecleanup() {
 	#convert file to unix format
 	cat -v "$domains_list"|diff -q - "$domains_list" 1> /dev/null || dos2unix "$domains_list"
 
+	#check for trailing spaces and remove them
+	grep -qr '[[:blank:]]$' "$domains_list" && ( sed -i 's/[[:space:]]\+$//' "$domains_list" && echo -e "${yellow}[Cleanup]${nc} Removed trailing whitespaces from $domains_list" )
+
 	#check for empty lines and remove them
 	grep -qc '^$' "$domains_list" && sed -i '/^$/d' "$domains_list" && echo -e "${yellow}[Cleanup]${nc} Removed blank lines from $domains_list"
 
