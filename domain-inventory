@@ -79,8 +79,8 @@ filecleanup() {
 	if [[ ! -z "$uniques" ]]
 	then
 		sort --unique "$domains_list" --output "$domains_list"
-		echo "$uniques" >> "$output_dir"/duplicate_domains.txt
-		echo -e "${yellow}[Cleanup]${nc} Removed duplicates: $(linecount "$output_dir"/duplicate_domains.txt) (see $output_dir/duplicate_domains.txt for a list)"
+		echo "$uniques" >> duplicate_domains.txt
+		echo -e "${yellow}[Cleanup]${nc} Removed duplicates: $(linecount duplicate_domains.txt) (see $output_dir/duplicate_domains.txt for a list)"
 	fi
 
 }
