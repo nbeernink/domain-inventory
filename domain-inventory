@@ -187,6 +187,9 @@ fetch_domainlist_from_server() {
 	elif ssh "$user"@"$server" "test -d /usr/local/directadmin"; then
 		echo "DirectAdmin detected"
 		ssh "$user"@"$server" "cat /etc/virtual/domainowners|cut -d: -f1" > "$domains_list"
+	elif ssh "$user"@"$server" "test -d /usr/local/cpanel"; then
+		echo "cPanel detected"
+		ssh "$user"@"$server" "cat /etc/localdomains" > "$domains_list"
 	else
 		echo -e "${red}[Failure]${nc} CP not supported!"
 		exit 1
