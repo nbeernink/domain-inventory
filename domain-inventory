@@ -165,8 +165,12 @@ analyse_dns_records () {
 	esac
 }
 
+ssh_command(){
+	ssh "$user"@"$server" "$1"
+}
+
 ssh_connect_test(){
-	if ssh -q "$user"@"$server" exit; then
+	if ssh_command exit; then
 		echo -e "${green}[Success]${nc} Connection to $user@$server successful!"
 	else
 		echo -e "${red}[Failure]${nc} Connection to $user@$server failed!"
@@ -176,20 +180,20 @@ ssh_connect_test(){
 
 fetch_domainlist_from_server() {
 	domains_list="$server"-domains.list
-	if ssh "$user"@"$server" "test -d /usr/local/psa"; then
-		plesk_version=$(ssh "$user"@"$server" "cut -d' ' -f1 /usr/local/psa/version|cut -d. -f1,2")
+	if ssh_command "test -d /usr/local/psa"; then
+		plesk_version=$(ssh_command "cut -d' ' -f1 /usr/local/psa/version|cut -d. -f1,2")
 		if [[ $plesk_version == "12.5" ]]; then
-			ssh "$user"@"$server" "plesk bin site --list" > "$domains_list"
+			ssh_command "plesk bin site --list" > "$domains_list"
 		else
-			ssh "$user"@"$server" "MYSQL_PWD=\$(cat /etc/psa/.psa.shadow) mysql -Ns -u admin -Dpsa -e 'SELECT name FROM domains'" > "$domains_list"
+			ssh_command "MYSQL_PWD=\$(cat /etc/psa/.psa.shadow) mysql -Ns -u admin -Dpsa -e 'SELECT name FROM domains'" > "$domains_list"
 		fi
 		echo "Plesk $plesk_version detected"
-	elif ssh "$user"@"$server" "test -d /usr/local/directadmin"; then
+	elif ssh_command "test -d /usr/local/directadmin"; then
 		echo "DirectAdmin detected"
-		ssh "$user"@"$server" "cat /etc/virtual/domainowners|cut -d: -f1" > "$domains_list"
-	elif ssh "$user"@"$server" "test -d /usr/local/cpanel"; then
+		ssh_command "cat /etc/virtual/domainowners|cut -d: -f1" > "$domains_list"
+	elif ssh_command "test -d /usr/local/cpanel"; then
 		echo "cPanel detected"
-		ssh "$user"@"$server" "cat /etc/localdomains" > "$domains_list"
+		ssh_command "cat /etc/localdomains" > "$domains_list"
 	else
 		echo -e "${red}[Failure]${nc} CP not supported!"
 		exit 1
@@ -199,9 +203,9 @@ fetch_domainlist_from_server() {
 
 
 fetch_iplist_from_server() {
-	ssh "$user"@"$server" "ip -4 -o addr show scope global"|awk '{gsub(/\/.*/,"",$4); print $4}' > "$server"-ipv4.list
+	ssh_command "ip -4 -o addr show scope global"|awk '{gsub(/\/.*/,"",$4); print $4}' > "$server"-ipv4.list
 	[[ -s "$server"-ipv4.list ]] && echo "Fetched IPv4 address list from $server"
-	ssh "$user"@"$server" "ip -6 -o addr show scope global"|awk '{gsub(/\/.*/,"",$4); print $4}' > "$server"-ipv6.list
+	ssh_command "ip -6 -o addr show scope global"|awk '{gsub(/\/.*/,"",$4); print $4}' > "$server"-ipv6.list
 	[[ -s "$server"-ipv6.list ]] && echo "Fetched IPv6 address list from $server"
 }
 
