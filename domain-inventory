@@ -53,7 +53,7 @@ make_output_dir() {
 
 	else
 		mkdir -p "$output_dir"
-		cd "$output_dir"
+		cd "$output_dir"||(echo "Error: Cannot cd into $output_dir" && exit 1)
 	fi
 }
 
