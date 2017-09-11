@@ -42,7 +42,7 @@ check_file_existence() {
 make_output_dir() {
 	declare output_dir="$1"
 	if [[ -d "$output_dir" ]]; then
-		while read -p "Output dir '$(basename "$output_dir")' exists, remove it and start over? (y/n) " answer
+		while read -r -p "Output dir '$(basename "$output_dir")' exists, remove it and start over? (y/n) " answer
 		do
 			case ${answer:0:1} in
 				y|Y ) rm -rf "$output_dir"; main;;
@@ -118,7 +118,7 @@ analyse_dns_records () {
 				if grep -qw "$domain" fetch_NS_result.txt;
 				then
 					echo "$domain" >> domains_resolving.txt
-					while read ns;
+					while read -r ns;
 					do
 						echo "$domain" >> domains_hosted_by_"$ns".txt
 					done < <(grep "^$domain\." fetch_NS_result.txt|awk '{print $5}'|awk -F. '{print $2}'|sort|uniq);
@@ -127,7 +127,7 @@ analyse_dns_records () {
 					if [[ -e domains_with_CNAME.txt ]];
 					then
 						#remove CNAMED domains from domains_non_resolving.txt
-						while read cname_domain;
+						while read -r cname_domain;
 						do
 							sed -i "/$cname_domain/d" domains_non_resolving.txt
 						done < <(awk '{print $1}' domains_with_CNAME.txt|uniq|sed 's/.$//')
@@ -138,7 +138,7 @@ analyse_dns_records () {
 
 			# check for domains that hosted by nameservers in different domains
 			# this could potentially require a DNS change in two (or more) separate places
-			while read domain;
+			while read -r domain;
 			do
 				if [[ $(wc -l <(grep "^$domain$" domains_hosted_by*|grep -v ':0')|awk '{print $1}') -gt 1 ]]; then
 					{
