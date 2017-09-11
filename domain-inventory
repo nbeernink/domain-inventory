@@ -191,6 +191,9 @@ fetch_domainlist_from_server() {
 	elif ssh_command "test -d /usr/local/directadmin"; then
 		echo "DirectAdmin detected"
 		ssh_command "cat /etc/virtual/domainowners|cut -d: -f1" > "$domains_list"
+	elif ssh_command "test -d /var/www/froxlor"; then
+		echo "Froxlor detected"
+		ssh_command "mysql -Ns -e 'select domain from panel_domains' froxlor" > "$domains_list"
 	elif ssh_command "test -d /usr/local/cpanel"; then
 		echo "cPanel detected"
 		ssh_command "cat /etc/localdomains" > "$domains_list"
