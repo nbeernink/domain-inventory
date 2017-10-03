@@ -3,6 +3,11 @@ Domain analytics tool useful for hosting companies who are doing migrations and
 need a quick overview of which nameservers a domain is using and which IP the
 A- or AAAA- records are pointing to.
 
+# installation
+
+1. `git clone git@github.com:nbeernink/domain-inventory.git`
+2. symlink the script into your path for example: `ln -s ~/git/domain-inventory/domain-inventory  ~/.bin/domain-inventory`
+
 ## example-usage
 
 ```
