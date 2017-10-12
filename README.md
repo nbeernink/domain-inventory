@@ -3,6 +3,15 @@ Domain analytics tool useful for hosting companies who are doing migrations and
 need a quick overview of which nameservers a domain is using and which IP the
 A- or AAAA- records are pointing to.
 
+# controlpanel support
+The script can log into a server via ssh using the `-s` parameter to fetch a list of domains. It can do this for the following CP's.
+
+* Plesk
+* DirectAdmin
+* Cpanel
+* Froxlor
+
+
 # installation
 
 1. `git clone git@github.com:nbeernink/domain-inventory.git`
