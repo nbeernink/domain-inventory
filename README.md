@@ -14,7 +14,7 @@ The script can log into a server via ssh using the `-s` parameter to fetch a lis
 
 # installation
 
-1. `git clone git@github.com:nbeernink/domain-inventory.git`
+1. `git clone https://github.com/nbeernink/domain-inventory.git`
 2. symlink the script into your path for example: `ln -s ~/git/domain-inventory/domain-inventory  ~/.bin/domain-inventory`
 
 ## example-usage
