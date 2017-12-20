@@ -306,7 +306,7 @@ main() {
 		analyse_dns_records AAAA
 	fi
 
-	print_summary
+	print_summary|tee summary.txt
 
 	exit 0
 }
