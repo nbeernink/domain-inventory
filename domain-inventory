@@ -91,9 +91,17 @@ fetch_dns_records() {
 	if [[ ! -e fetch_"$recordtype"_result.txt ]]; then
 		echo "Scanning $(linecount "$domains_list") domains for $recordtype records..."
 		echo
+		counter=0
 		while IFS= read -r domain
 		do
-			dig "$recordtype" +noall +answer "$domain" >> fetch_"$recordtype"_result.txt &
+			if [[ "$counter" == 100 ]]; then
+				echo Procesing...
+				sleep 5
+				counter=0
+			else
+				dig "$recordtype" +noall +answer "$domain" >> fetch_"$recordtype"_result.txt &
+				counter=$((counter+1))
+			fi
 		done < "$domains_list"
 		wait
 	else
