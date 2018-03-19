@@ -161,6 +161,27 @@ analyse_dns_records () {
 			echo
 			;;
 
+		MX)
+			while read -r domain;
+			do
+				if grep -qw "$domain" fetch_MX_result.txt;
+				then
+					while read -r mx;
+					do
+						echo "$domain" >> mail_handled_by_"$mx".txt
+						# group all mx-servers by main domain for example if foobar.com has
+						# mx1.example.org
+						# mx2.example.org
+						# foobar.com is stored in mail_handled_by_example.org.txt
+					done < <(grep "^$domain\." fetch_MX_result.txt|awk '{print $6}'|rev|cut -d'.' -f2,3|rev|sed 's/\.$//'|uniq);
+				fi
+			done < domains_resolving.txt
+
+			echo "Mailserver distribution:"
+			wc -l mail_handled_by_*
+			echo
+			;;
+
 		A)
 			grep -f "$ipv4_list" fetch_A_result.txt >> domains_aligned.txt
 			grep -vf "$ipv4_list" fetch_A_result.txt >> domains_unaligned.txt
@@ -305,6 +326,9 @@ main() {
 		fetch_dns_records AAAA domains_resolving.txt
 		analyse_dns_records AAAA
 	fi
+
+	fetch_dns_records MX domains_resolving.txt
+	analyse_dns_records MX
 
 	print_summary|tee summary.txt
 
