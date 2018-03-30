@@ -343,22 +343,22 @@ while true; do
 	key="$1"
 	case "$key" in
 		-d|--domainslist)
-			domains_list=$(realpath "$2")
+			domains_list=$(readlink -f -- "$2")
 			check_file_existence "$domains_list"
 			shift # past argument
 			;;
 		-i|--ipv4list)
-			ipv4_list=$(realpath "$2")
+			ipv4_list=$(readlink -f -- "$2")
 			check_file_existence "$ipv4_list"
 			shift # past argument
 			;;
 		-6|--ipv6list)
-			ipv6_list=$(realpath "$2")
+			ipv6_list=$(readlink -f -- "$2")
 			check_file_existence "$ipv6_list"
 			shift # past argument
 			;;
 		-o|--output-dir)
-			output_dir=$(realpath "$2")
+			output_dir=$(readlink -f -- "$2")
 			shift # past argument
 			;;
 		-s|--server)
