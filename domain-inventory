@@ -99,7 +99,7 @@ fetch_dns_records() {
 				sleep 5
 				counter=0
 			else
-				dig "$recordtype" +noall +answer "$domain" >> fetch_"$recordtype"_result.txt &
+				dig "$recordtype" +tcp +noall +answer "$domain" >> fetch_"$recordtype"_result.txt &
 				counter=$((counter+1))
 			fi
 		done < "$domains_list"
