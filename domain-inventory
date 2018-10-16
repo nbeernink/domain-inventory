@@ -195,12 +195,29 @@ analyse_dns_records () {
 }
 
 ssh_command(){
-	ssh "$user"@"$server" "$1"
+	if $sudo_available; then
+		ssh "$user"@"$server" "sudo $1"
+	else
+		ssh "$user"@"$server" "$1"
+	fi
+}
+
+sudo_check(){
+	if [[ $user != 'root' ]] ; then
+		if ssh_command 'sudo true'; then
+			echo -e "${green}[Success]${nc} Sudo permissions available!"
+			sudo_available=true
+		else
+			echo -e "${red}[Failure]${nc} No sudo permissiones available!"
+			exit 1
+		fi
+	fi
 }
 
 ssh_connect_test(){
-	if ssh_command exit; then
+	if ssh_command true; then
 		echo -e "${green}[Success]${nc} Connection to $user@$server successful!"
+		sudo_check
 	else
 		echo -e "${red}[Failure]${nc} Connection to $user@$server failed!"
 		exit 1
