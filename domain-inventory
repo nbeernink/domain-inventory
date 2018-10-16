@@ -228,7 +228,8 @@ fetch_domainlist_from_server() {
 	domains_list="$server"-domains.list
 	if ssh_command "test -d /usr/local/psa"; then
 		plesk_version=$(ssh_command "cut -d' ' -f1 /usr/local/psa/version|cut -d. -f1,2")
-		if [[ $plesk_version == "12.5" ]]; then
+		plesk_major_version=$(echo "$plesk_version"|cut -d. -f1)
+		if [[ $plesk_major_version -ge 12 ]]; then
 			ssh_command "plesk bin site --list" > "$domains_list"
 		else
 			ssh_command "MYSQL_PWD=\$(cat /etc/psa/.psa.shadow) mysql -Ns -u admin -Dpsa -e 'SELECT name FROM domains'" > "$domains_list"
